@@ -34,11 +34,10 @@ class UserController
         Response::returnResponse(( $response ) );
     }
     
-    public static function store()
+    public static function store( $data )
     {
         /* Valid user */
         Validjwt::confirmAuthentication();
-        $data = Flight::request()->data;
         $labelsIn = [ 'name', 'email', 'phone', 'password' ];
         $validIn = ValidData::validIN( $data, $labelsIn );
         if( sizeof( $validIn) > 0 ) { Response::returnResponse( $validIn ); }
@@ -93,9 +92,8 @@ class UserController
         Response::returnResponse( $response );
     }
 
-    public static function login()
+    public static function login( $data )
     {
-        $data = Flight::request()->data;
         $labelsIn = [ 'email', 'password' ];
         /* Valid data */
         $validIn = ValidData::validIN( $data, $labelsIn );
@@ -113,7 +111,6 @@ class UserController
         /* Update Token */
         $id    = $findUser[ 'data' ][ 'id' ];
         $email = $findUser[ 'data' ][ 'email' ];
-        $rol   = $findUser[ 'data' ][ 'rol' ];
         
         $token = Validjwt::setToken( $id, $email );
         /* Actualizar Token */
@@ -129,8 +126,7 @@ class UserController
                 'data'   => [
                     'user'   => $findUser[ 'data' ][ 'name' ],
                     'token'  => $token,
-                    'id'     => $id,
-                    'rol'    => $rol
+                    'id'     => $id
                 ]
             ]);
         } else

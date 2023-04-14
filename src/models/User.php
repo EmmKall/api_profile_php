@@ -57,7 +57,7 @@ class User
 
     public function login( $arrData ): array
     {
-        $sql = ' SELECT id, name, email, rol, password FROM users WHERE email = :email ';
+        $sql = ' SELECT id, name, email, password FROM users WHERE email = :email ';
         $response = Conection::find( $sql, $arrData );
         return $response;
     }

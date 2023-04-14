@@ -9,7 +9,7 @@ class ValidData
     {
         $response = [];
         foreach ($labels as $value ) {
-            if( $data[ $value ] === null || trim( $data[ $value ] ) === '' )
+            if( $data->$value === null || trim( $data->$value ) === '' )
             {
                 $response = [
                     'status' => 403,
