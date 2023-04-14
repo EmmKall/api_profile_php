@@ -31,7 +31,7 @@ class ProyectController
     {
         // Valid user
         Validjwt::confirmAuthentication();
-        $labelsIn = [ 'name', 'img', 'description', 'tecnologies' ];
+        $labelsIn = [ 'name', 'img', 'description', 'tecnologies', 'url', 'git' ];
         $validIn = ValidData::validIN( $data, $labelsIn );
         if( sizeof( $validIn) > 0 ) { Response::returnResponse( $validIn ); }
         /* Create data */
@@ -40,6 +40,8 @@ class ProyectController
             ':slug'         => Data::createSlug( $data->name ),
             ':description'  => $data->description,
             ':tecnologies'  => $data->tecnologies,
+            ':git'  => $data->git,
+            ':url'  => $data->url,
             ':img'  => $data->img,
         ];
         $proyect = new Proyect();
@@ -52,7 +54,7 @@ class ProyectController
     {
         /* Valid user */
         Validjwt::confirmAuthentication();
-        $labelsIn = [  'id', 'name', 'description', 'tecnologies', 'img' ];
+        $labelsIn = [  'id', 'name', 'description', 'tecnologies', 'img', 'url', 'git' ];
         /* Valid data */
         $validIn = ValidData::validIN( $data, $labelsIn );
         if( sizeof( $validIn) > 0 ) { Response::returnResponse( $validIn ); }
@@ -66,6 +68,8 @@ class ProyectController
             ':name'         => $data->name,
             ':slug'         => Data::createSlug( $data->name ),
             ':img'          => $data->img,
+            ':git'  => $data->git,
+            ':url'  => $data->url,
             ':description'  => $data->description,
             ':tecnologies'  => $data->tecnologies,
         ];

@@ -26,11 +26,11 @@ class Routes
         $this->getRequest();
         $uri =  explode( '/', $_SERVER['REQUEST_URI'] );
         //Get Controller
-        $this->getController( $uri[ 2 ] );
+        $this->getController( $uri[ 2 ] );  //Prod 3
         //Get Method
-        $this->getMethod( $uri[ 3 ] );
+        $this->getMethod( $uri[ 3 ] );  //Prod 4
         //Get Params
-        $this->getParams( $uri[ 4 ] ?? '' );
+        $this->getParams( $uri[ 4 ] ?? '' ); //Prod 5
         //Process Petition
         $this->validPetition();
         $this->proccessController();
