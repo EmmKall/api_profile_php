@@ -14,14 +14,14 @@ class Proyect
 
     public function index(): array
     {
-        $sql = ' SELECT id, name, img, slug, description, tecnologies, git, url, created_at FROM proyects ORDER BY created_at DESC ';
+        $sql = ' SELECT id, name, img, imgs, slug, description, tecnologies, git, url, created_at FROM proyects ORDER BY created_at DESC ';
         $response = Conection::getAll( $sql );
         return $response;
     }
 
     public function find( $arrData ): array
     {
-        $sql = " SELECT id, name, img, slug, description, tecnologies, git, url, created_at FROM proyects WHERE id = :id ";
+        $sql = " SELECT id, name, img, imgs, slug, description, tecnologies, git, url, created_at FROM proyects WHERE id = :id ";
         $response = Conection::find( $sql, $arrData );
         return $response;
     }
@@ -35,7 +35,7 @@ class Proyect
 
     public function update( array $arrData ): array
     {
-        $sql = ' UPDATE proyects SET name = :name, img = :img, slug = :slug, description = :description, tecnologies = :tecnologies, url = :url, git = _git WHERE id = :id ';
+        $sql = ' UPDATE proyects SET name = :name, img = :img, slug = :slug, description = :description, tecnologies = :tecnologies, url = :url, git = :git WHERE id = :id ';
         $response = Conection::update( $sql, $arrData );
         return $response;
     }

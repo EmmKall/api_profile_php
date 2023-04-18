@@ -2,7 +2,6 @@
 
 namespace Controller;
 
-use Flight;
 use Model\User;
 use Helper\Mail;
 use Helper\ValidData;
@@ -54,11 +53,10 @@ class UserController
         Response::returnResponse( $user );
     }
 
-    public static function update()
+    public static function update( $data )
     {
         /* Valid user */
         Validjwt::confirmAuthentication();
-        $data = Flight::request()->data;
         $labelsIn = [  'id', 'name', 'email', 'phone' ];
         /* Valid data */
         $validIn = ValidData::validIN( $data, $labelsIn );
@@ -138,9 +136,8 @@ class UserController
         }
     }
 
-    public static function forget_password()
+    public static function forget_password( $data )
     {
-        $data = Flight::request()->data;
         $labelsIn = [ 'email' ];
         /* Valid data */
         $validIn = ValidData::validIN( $data, $labelsIn );
@@ -180,11 +177,10 @@ class UserController
         Response::returnResponse( $response );
     }
 
-    public static function update_pass()
+    public static function update_pass( $data )
     {
         /* Valid user */
         Validjwt::confirmAuthentication();
-        $data = Flight::request()->data;
         $labelsIn = [ 'email', 'password' ];
         /* Valid data */
         $validIn = ValidData::validIN( $data, $labelsIn );

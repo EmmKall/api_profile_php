@@ -13,7 +13,7 @@ class Routes
     private string $controller;
     private string $method;
     private string $param;
-    private array  $allow_proccess = [ 'index' => 'GET', 'find' => 'GET', 'find' => 'GET', 'findall' => 'GET', 'store' => 'POST', 'login'=> 'POST', 'forget_password' => 'POST', 'update_pass' => 'POST', 'update' => 'PUT', 'destroy' => 'DELETE' ];
+    private array  $allow_proccess = [ 'index' => 'GET', 'find' => 'GET', 'find' => 'GET', 'findall' => 'GET', 'store' => 'POST', 'login'=> 'POST', 'forget_password' => 'POST', 'update_pass' => 'POST', 'load_img' => 'POST', 'update' => 'PUT/POST', 'destroy' => 'DELETE' ];
 
     public function __construct()
     {
@@ -69,19 +69,23 @@ class Routes
             break;
         }
         if( $this->request === 'GET' || $this->request === 'DELETE' ){ $instance->{$this->method}( $this->param ); }
-        elseif( $this->request === 'POST' || $this->request === 'PUT' ){
-            $data = Data::readData();
+        elseif( $this->method === 'load_img' )
+        {
+            $data = Data::readData() ?? $_POST;
             $instance->{$this->method}( $data );
         }
-        var_dump( $instance );
-        /* $response = $instance::{$this->method()};
-        Response::returnResponse( $response ); */
+        elseif( $this->request === 'POST' || $this->request === 'PUT' )
+        {
+            $data = Data::readData() ?? $_POST;
+            $files = $_FILES;
+            $instance->{$this->method}( $data, $files );
+        }
     }
 
     /* Valid that request and method match */
     private function validPetition(): void
     {
-        $isValidProcces = ( array_key_exists( $this->method, $this->allow_proccess ) && $this->allow_proccess[ $this->method ] === $this->request );
+        $isValidProcces = ( array_key_exists( $this->method, $this->allow_proccess ) && str_contains( $this->allow_proccess[ $this->method ], $this->request ) );
         if( !$isValidProcces )
         {
             $response = [

@@ -4,7 +4,7 @@ namespace Config;
 
 class ConfigDB
 {
-
+ 
     private static function getLocal()
     {
         $IS_LOCAL = ( str_contains( $_SERVER['SERVER_ADDR'], '::1' ) || str_contains( $_SERVER['SERVER_ADDR'], 'localhost' ) || str_contains( $_SERVER['HTTP_HOST'], 'http://127.0.0.1/' )  );
