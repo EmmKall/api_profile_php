@@ -5,6 +5,23 @@ namespace Helper;
 class Data
 {
 
+    public static function sHtml( $html ): string {
+        return htmlspecialchars( $html );
+    }
+
+    public static function validData( array $keys, object $data ) {
+        $alerts = [];
+        foreach ( $keys as $item ) {
+            if( trim( $data->$item  ) == '' ){ $alerts[ 'error' ][] = $item .' is required'; }
+        }
+        if( sizeof( $alerts ) > 0 ){ Response::response( 400, $alerts, 'Missing information' ); }
+    }
+
+    public static function getDataRequest() {
+        $data = json_decode( file_get_contents( 'php://input' ) ) ?? null;
+        return $data;
+    }
+
     public static function readData()
     {
         $data = json_decode( file_get_contents( 'php://input' ) ) ?? null;
@@ -36,11 +53,7 @@ class Data
             }
         }
         if( $flag ) {
-            $response = [
-                'status' => 403,
-                'msg' => 'Format not valid'
-            ];
-            Response::returnResponse( $response );
+            Response::response( 403, [], 'Format not valid' );
         }
         return explode( '/', $type )[1];
     }
@@ -51,5 +64,18 @@ class Data
         }
         return $data;
     }
+
+    public static function removeColumns( array $data, array $rows ){
+        
+        foreach ($data as $keyi => $value) {
+            foreach ( $rows as $row ) {
+                if( $row === $value ){
+                    unset( $data[ $keyi ] );
+                }
+            }
+        }
+        return $data;
+    }
+
 
 }

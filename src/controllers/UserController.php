@@ -8,16 +8,22 @@ use Helper\ValidData;
 use Helper\Password;
 use Helper\Response;
 use Helper\Validjwt;
+use Route\Routes;
 
 class UserController
 {
+    public static function register( Routes $request ) {
+        die( json_encode( $request ) );
+    }
+
     public static function index()
     {
         /* Valid user */
-        Validjwt::confirmAuthentication();
+        //Validjwt::confirmAuthentication();
         $user = new User();
         $response = $user->index();
-        Response::returnResponse( $response );
+        die( json_encode( $response ) );
+        //Response::returnResponse( $response );
     }
 
     public static function find( $id )
@@ -25,12 +31,12 @@ class UserController
         /* Valid user */
         Validjwt::confirmAuthentication();
         $isNumeric = ValidData::isNumeric( $id );
-        if( sizeof( $isNumeric ) > 0 ) { Response::returnResponse( $isNumeric ); }
+        if( sizeof( $isNumeric ) > 0 ) { /* Response::returnResponse( $isNumeric ); */ }
         /* Create data */
         $arrData = [':id' => $id ];
         $user = new User();
         $response = $user->find( $arrData );
-        Response::returnResponse(( $response ) );
+        //Response::returnResponse(( $response ) );
     }
     
     public static function store( $data )
@@ -39,7 +45,7 @@ class UserController
         Validjwt::confirmAuthentication();
         $labelsIn = [ 'name', 'email', 'phone', 'password' ];
         $validIn = ValidData::validIN( $data, $labelsIn );
-        if( sizeof( $validIn) > 0 ) { Response::returnResponse( $validIn ); }
+        if( sizeof( $validIn) > 0 ) { /* Response::returnResponse( $validIn ); */ }
         /* Create data */
         $arrData = [
             ':name'     => $data->name,
@@ -50,7 +56,7 @@ class UserController
         $user = new User();
         $user = $user->store( $arrData );
         
-        Response::returnResponse( $user );
+        //Response::returnResponse( $user );
     }
 
     public static function update( $data )
@@ -60,10 +66,10 @@ class UserController
         $labelsIn = [  'id', 'name', 'email', 'phone' ];
         /* Valid data */
         $validIn = ValidData::validIN( $data, $labelsIn );
-        if( sizeof( $validIn) > 0 ) { Response::returnResponse( $validIn ); }
+        if( sizeof( $validIn) > 0 ) { /* Response::returnResponse( $validIn ); */ }
         /* Valid id */
         $isNumeric = ValidData::isNumeric( $data->id );
-        if( sizeof( $isNumeric ) > 0 ) { Response::returnResponse( $isNumeric ); }
+        if( sizeof( $isNumeric ) > 0 ) { /* Response::returnResponse( $isNumeric ); */ }
         $user = new User();
         /* Create Data */
         $arrData = [
@@ -74,7 +80,7 @@ class UserController
         ];
         $pass = ( $data->password !== null ) ? $data->password : '';
         $response = $user->update( $arrData, $pass );
-        Response::returnResponse( $response );
+        //Response::returnResponse( $response );
     }
 
     public static function destroy( $id )
@@ -82,12 +88,12 @@ class UserController
         /* Valid user */
         Validjwt::confirmAuthentication();
         $isNumeric = ValidData::isNumeric( $id );
-        if( sizeof( $isNumeric ) > 0 ) { Response::returnResponse( $isNumeric ); }
+        if( sizeof( $isNumeric ) > 0 ) { /* Response::returnResponse( $isNumeric ); */ }
         /* Create data */
         $arrData = [':id' => $id ];
         $user = new User();
         $response = $user->destroy( $arrData );
-        Response::returnResponse( $response );
+        //Response::returnResponse( $response );
     }
 
     public static function login( $data )
@@ -95,15 +101,15 @@ class UserController
         $labelsIn = [ 'email', 'password' ];
         /* Valid data */
         $validIn = ValidData::validIN( $data, $labelsIn );
-        if( sizeof( $validIn) > 0 ) { Response::returnResponse( $validIn ); }
+        if( sizeof( $validIn) > 0 ) { /* Response::returnResponse( $validIn ); */ }
         /* Create data */
         $arrData = [ ':email' => $data->email ];
         $user = new User();
         $findUser = $user->login( $arrData );
-        if( !$findUser[ 'data' ] ){ Response::returnResponse([
+        if( !$findUser[ 'data' ] ){ /* Response::returnResponse([
             'status' => 403,
             'msg'    => 'Email y/o password not valid'
-        ]); }
+        ]); */ }
         /* Valid Password */
         Password::DesEncryp( $data->password, $findUser[ 'data']['password'] );
         /* Update Token */
@@ -119,20 +125,20 @@ class UserController
         $updateToken = $user->setToken( $arrData );
         if( $updateToken[ 'status' ] === 200 )
         {
-            Response::returnResponse([
+            /* Response::returnResponse([
                 'status' => 200,
                 'data'   => [
                     'user'   => $findUser[ 'data' ][ 'name' ],
                     'token'  => $token,
                     'id'     => $id
                 ]
-            ]);
+            ]); */
         } else
         {
-            Response::returnResponse([
+            /* Response::returnResponse([
                 'status' => 500,
                 'msg'   => 'internal error'
-            ]);
+            ]); */
         }
     }
 
@@ -141,14 +147,14 @@ class UserController
         $labelsIn = [ 'email' ];
         /* Valid data */
         $validIn = ValidData::validIN( $data, $labelsIn );
-        if( sizeof( $validIn) > 0 ) { Response::returnResponse( $validIn ); }
+        if( sizeof( $validIn) > 0 ) { /* Response::returnResponse( $validIn ); */ }
         $arrData = [ ':email' => $data->email ];
         $user = new User();
         $findUser = $user->login( $arrData );
-        if( !$findUser[ 'data' ] ){ Response::returnResponse([
+        if( !$findUser[ 'data' ] ){ /* Response::returnResponse([
             'status' => 403,
             'msg'    => 'Internal error'
-        ]); }
+        ]); */ }
         /* Generar ramdom password */
         $new_pass = Password::genereRamdomPassword();
         /* Update new password */
@@ -163,7 +169,7 @@ class UserController
                 'status' => 500,
                 'msg'    => 'Internal error'
             ];
-            Response::returnResponse( $response );
+            //Response::returnResponse( $response );
         }
         /* Send by email */
         $body_mail = Mail::create_body( $new_pass );
@@ -174,7 +180,7 @@ class UserController
             'email'    => $data->email,
             'new_pass' => $new_pass
         ];        // Response
-        Response::returnResponse( $response );
+        //Response::returnResponse( $response );
     }
 
     public static function update_pass( $data )
@@ -184,7 +190,7 @@ class UserController
         $labelsIn = [ 'email', 'password' ];
         /* Valid data */
         $validIn = ValidData::validIN( $data, $labelsIn );
-        if( sizeof( $validIn) > 0 ) { Response::returnResponse( $validIn ); }
+        if( sizeof( $validIn) > 0 ) { /* Response::returnResponse( $validIn ); */ }
         /* Create Data */
         $arrData = [
             ':email'    => $data->email,
@@ -193,7 +199,7 @@ class UserController
         /* Update Password */
         $user = new User();
         $response = $user->updatePassword( $arrData );
-        Response::returnResponse( $response );
+        //Response::returnResponse( $response );
     }
 
 }

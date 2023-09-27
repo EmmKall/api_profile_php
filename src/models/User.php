@@ -3,10 +3,13 @@
 namespace Model;
 
 use Database\Conection;
+use Helper\Data;
 use Helper\Password;
 
 class User
 {
+    private array $columnsDB = [ 'id', 'name', 'email', 'phone', 'token', 'password', 'created_at', 'updated_at' ];
+    private string $table = 'users';
 
     public function __construct()
     {
@@ -15,7 +18,10 @@ class User
 
     public function index(): array
     {
-        $sql = ' SELECT id, name, email, phone, rol FROM users ORDER BY name, email ';
+        $removeColumns = [ 'password' ];
+        $columns = Data::removeColumns( $this->columnsDB, $removeColumns );
+        $columns = implode( ", ", $this->columnsDB );
+        $sql = ' SELECT ' . $columns . ' FROM ' . $this->table . ' ORDER BY name, email ';
         $response = Conection::getAll( $sql );
         return $response;
     }

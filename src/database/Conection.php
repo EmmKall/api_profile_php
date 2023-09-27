@@ -54,36 +54,32 @@ class Conection
     public static function getAll( String $sql ): array
     {
         $conn = Conection::make_conection();
+        $result = null;
         try
         {
             $result = $conn->query( $sql );
-            $result = $result->fetchall( \PDO::FETCH_CLASS );
-            $response = [
-                'status' => 200,
-                'data' => $result
-            ];
+            $response = $result->fetchall( \PDO::FETCH_CLASS );
         } catch( \PDOException $e )
         {
             $response = [
                 'status' => 500,
-                'msg' => 'Hubo un error: ' . $e->getMessage() . ' en: ' . $e->getTrace() . ' linea: ' . $e->getLine()
+                'msg'    => 'Hubo un error: ' . $e->getMessage() . ' en: ' . $e->getTrace() . ' linea: ' . $e->getLine()
             ];
         }
+        $result = null;
+        $conn = null;
         return $response;
     }
 
     public static function findAll( string $sql, Array $arrData )
     {
         $conn = Conection::make_conection();
+        $query = null;
         try
         {
             $query = $conn->prepare( $sql );
             $query->execute( $arrData );
-            $result = $query->fetchall( \PDO::FETCH_CLASS );
-            $data = [
-                'status' => 200,
-                'data' => $result
-            ];
+            $data = $query->fetchall( \PDO::FETCH_CLASS );
         } catch( \PDOException $e )
         {
             /* Log $e->getMessage() */
@@ -92,21 +88,20 @@ class Conection
                 'msg' => 'Hubo un error: ' . $e->getMessage() . ' en: ' . $e->getTrace() . ' linea: ' . $e->getLine()
             ];
         }
+        $query = null;
+        $conn = null;
         return $data;
     }
 
     public static function find( String $sql, Array $arrData ): array
     {
         $conn = Conection::make_conection();
+        $query = null;
         try
         {
             $query = $conn->prepare( $sql );
             $query->execute( $arrData );
             $data = $query->fetch( \PDO::FETCH_ASSOC );
-            $data = [
-                'status' => 200,
-                'data' => $data
-            ];
         } catch( \PDOException $e )
         {
             /* Log $e->getMessage() */
@@ -115,21 +110,20 @@ class Conection
                 'msg' => 'Hubo un error: ' . $e->getMessage() . ' en: ' . $e->getTrace() . ' linea: ' . $e->getLine()
             ];
         }
+        $query = null;
+        $conn = null;
         return $data;
     }
 
     public static function store( String $sql, Array $arrData ): Array
     {
         $conn = Conection::make_conection();
+        $insert = null;
         try
         {
             $insert = $conn->prepare( $sql );
             $insert->execute( $arrData );
-            $idInserted = $conn->lastInsertId();
-            $response = [
-                'status' => 200,
-                'msg' => 'Registro insertado', 'id' => $idInserted
-            ];
+            $response = $conn->lastInsertId();        
         } catch( \PDOException $e )
         {
             /* Log $e->getMessage() */
@@ -138,12 +132,15 @@ class Conection
                 'msg' => 'Hubo un error: ' . $e->getMessage() . ' en: ' . $e->getTrace() . ' linea: ' . $e->getLine()
             ];
         }
+        $insert = null;
+        $conn = null;
         return $response;
     }
 
     public static function update( String $sql, Array $arrData )
     {
         $conn = Conection::make_conection();
+        $query = null;
         try
         {
             $query = $conn->prepare( $sql );
@@ -159,12 +156,15 @@ class Conection
                 'msg' => 'Hubo un error: ' . $e->getMessage() . ' en: ' . $e->getTrace() . ' linea: ' . $e->getLine()
             ];
         }
+        $query = null;
+        $conn = null;
         return $response;
     }
 
     public static function destroy( String $sql, Array $arrData )
     {
         $conn = Conection::make_conection();
+        $query = null;
         try
         {
             $query = $conn->prepare( $sql );
@@ -181,6 +181,8 @@ class Conection
                 'msg' => 'Hubo un error: ' . $e->getMessage() . ' en: ' . $e->getTrace() . ' linea: ' . $e->getLine()
             ];
         }
+        $query = null;
+        $conn = null;
         return $response;
     }
 

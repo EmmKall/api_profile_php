@@ -3,97 +3,83 @@
 namespace Route;
 
 use Controller\UserController;
-use Controller\ProyectController;
 use Helper\Data;
 use Helper\Response;
 
 class Routes
 {
-    private string $request;
-    private string $controller;
-    private string $method;
-    private string $param;
-    private array  $allow_proccess = [ 'index' => 'GET', 'find' => 'GET', 'find' => 'GET', 'findall' => 'GET', 'store' => 'POST', 'login'=> 'POST', 'forget_password' => 'POST', 'update_pass' => 'POST', 'load_img' => 'POST', 'update' => 'PUT/POST', 'destroy' => 'DELETE' ];
+    public array $getRoutes    = [];
+    public array $postRoutes   = [];
+    public array $putRoutes    = [];
+    public array $deleteRoutes = [];
+    public $data = null;
+    public string $controller = '';
+    public string $request = '';
+    public string $method = '';
+    public string $param = '';
 
-    public function __construct()
-    {
-        $this->getPetition();
+    public function get( $url, $fn ) {
+        $this->getRoutes[ $url ] = $fn;
     }
-    /* Get data and proccess petition */
-    private function getPetition(): void
-    {
-        //Get Request
-        $this->getRequest();
-        $uri =  explode( '/', $_SERVER['REQUEST_URI'] );
-        //Get Controller
-        $this->getController( $uri[ 2 ] );  //Prod 3
-        //Get Method
-        $this->getMethod( $uri[ 3 ] );  //Prod 4
-        //Get Params
-        $this->getParams( $uri[ 4 ] ?? '' ); //Prod 5
-        //Process Petition
-        $this->validPetition();
-        $this->proccessController();
-        
+
+    public function post( $url, $fn ) {
+        $this->postRoutes[ $url ] = $fn;
     }
-    /* Get Request */
-    private function getRequest(): void
-    {
-        $this->request = $_SERVER['REQUEST_METHOD'] ?? '';
+    
+    public function put( $url, $fn ) {
+        $this->putRoutes[ $url ] = $fn;
     }
-    /* Get controller of petiticon */
-    public function getController( $controller ): void
-    {
-        $this->controller = ucfirst( $controller . 'Controller' ) ?? '';
+
+    public function delete( $url, $fn ) {
+        $this->deleteRoutes[ $url ] = $fn;
     }
-    /* Get Method of petition */
-    private function getMethod( $method ): void
-    {
-        $this->method = $method ?? '';
-    }
-    /* Get params in case to exist */
-    private function getParams( $params ): void
-    {
-        $this->param = $params ?? '';
-    }
-    /* Valid a correct controller */
-    private function proccessController()
-    {
-        $instance = null;
-        switch ( $this->controller ) {
-            case 'UserController':      $instance = new UserController(); break;      
-            case 'ProyectController':   $instance = new ProyectController(); break;      
+
+    public function comprobarRoutes() {
+
+        session_start();
+        //Get Params in
+        $index = $_ENV[ 'INDEX_FN' ] ?? '';
+        $this->request = $_SERVER[ 'REQUEST_METHOD' ];
+        $request = explode( '/', $_SERVER['REQUEST_URI'] );
+        $this->controller = $request[ $index ] ?? '';
+        $this->method = $request[ $index + 1 ] ?? '';
+        $this->param = $request[ $index + 2 ] ?? '';
+        $this->data = Data::getDataRequest();
+        $fn = $this->controller . '/' . $this->method;
+        switch ( $this->request ) {
+            case 'GET':
+                $fn = $this->getRoutes[ $fn ] ?? null;
+                break;            
+            case 'POST':
+                $fn = $this->postRoutes[ $fn ] ?? null;
+                break;            
+            case 'PUT':
+                $fn = $this->putRoutes[ $fn ] ?? null;
+                break;            
+            case 'DELETE':
+                $fn = $this->deleteRoutes[ $fn ] ?? null;
+                break;            
             default:
-            $response = [ 'status' => 400, 'msg' => 'Controller no found' ];
-                Response::returnResponse( $response );
-            break;
+                break;
         }
-        if( $this->request === 'GET' || $this->request === 'DELETE' ){ $instance->{$this->method}( $this->param ); }
-        elseif( $this->method === 'load_img' )
-        {
-            $data = Data::readData() ?? $_POST;
-            $instance->{$this->method}( $data );
+        if( $fn ) {
+            call_user_func( $fn, $this );
+        } else {
+            Response::response( 400, [], 'Data not fount' );
         }
-        elseif( $this->request === 'POST' || $this->request === 'PUT' )
-        {
-            $data = Data::readData() ?? $_POST;
-            $files = $_FILES;
-            $instance->{$this->method}( $data, $files );
-        }
+
     }
 
-    /* Valid that request and method match */
-    private function validPetition(): void
-    {
-        $isValidProcces = ( array_key_exists( $this->method, $this->allow_proccess ) && str_contains( $this->allow_proccess[ $this->method ], $this->request ) );
-        if( !$isValidProcces )
-        {
-            $response = [
-                'status' => 403,
-                'msg'    => 'Petition no valid'
-            ];
-            Response::returnResponse( $response );
+    public function render( $view, $data = [] ) {
+        foreach ( $data as $key => $item ) {
+            $$key = $item;
         }
+        ob_start();
+
+        include_once __DIR__ . '/view/' . $view . '.php';
+        $content = ob_get_clean();
+        include_once __DIR__ . '/views/layout.php';
     }
+
 
 }
