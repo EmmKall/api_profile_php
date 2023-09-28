@@ -9,7 +9,7 @@ class Response
         die( json_encode( $data ) );
     }
 
-    public static function response( $status, $data, $msg )
+    public static function response( int $status, string $msg, array $data = [] )
     {
         $response = [
             'status' => $status,

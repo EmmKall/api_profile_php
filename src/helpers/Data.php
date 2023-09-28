@@ -14,7 +14,7 @@ class Data
         foreach ( $keys as $item ) {
             if( trim( $data->$item  ) == '' ){ $alerts[ 'error' ][] = $item .' is required'; }
         }
-        if( sizeof( $alerts ) > 0 ){ Response::response( 400, $alerts, 'Missing information' ); }
+        if( sizeof( $alerts ) > 0 ){ Response::response( 400, 'Missing information', $alerts ); }
     }
 
     public static function getDataRequest() {
@@ -53,7 +53,7 @@ class Data
             }
         }
         if( $flag ) {
-            Response::response( 403, [], 'Format not valid' );
+            Response::response( 403, 'Format not valid' );
         }
         return explode( '/', $type )[1];
     }
@@ -63,6 +63,11 @@ class Data
             $data = json_decode( json_encode( $data) );
         }
         return $data;
+    }
+
+    public static function objectToArray( $data ) {
+        die( json_encode( gettype( $data )) );
+        return json_decode( json_encode( $data ) );
     }
 
     public static function removeColumns( array $data, array $rows ){
@@ -77,5 +82,17 @@ class Data
         return $data;
     }
 
+    public static function removeDates( array $data, bool $insert = false ) {
+        if( $insert ){ array_shift( $data ); }
+        array_pop( $data );
+        array_pop( $data );
+        return $data;
+    }
+
+    public static function getDataQuery( $data ) {
+        $arrData = [];
+        foreach ( $data as $key => $value ) { $arrData[ ':' . $key ] = $value; }
+        return $arrData;
+    }
 
 }

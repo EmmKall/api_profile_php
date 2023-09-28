@@ -5,20 +5,15 @@ namespace Helper;
 class ValidData
 {
 
-    public static function validIN( $data, $labels ): array
+    public static function validIn( $data, $labels ): void
     {
-        $response = [];
         foreach ($labels as $value ) {
-            if( $data->$value === null || trim( $data->$value ) === '' )
+            if( !isset( $data->$value ) || ($data->$value === null || trim( $data->$value ) === '') )
             {
-                $response = [
-                    'status' => 403,
-                    'msg'    => 'Missing data'
-                ];
+                Response::response( 400, 'Missing data: ' . $value );
                 break;
             }
         }
-        return $response;
     }
     
     public static function isNumeric( $number ): array
@@ -26,11 +21,7 @@ class ValidData
         $response = [];
         if( !is_numeric( $number ) )
         {
-            $response = 
-            [
-                'status' => 403,
-                'msg'    => 'Data not valid'
-            ];
+            Response::response( 400, $number . ' is not a valid data' );
         }
         return $response;
     }

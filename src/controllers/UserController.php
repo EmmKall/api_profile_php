@@ -2,6 +2,7 @@
 
 namespace Controller;
 
+use Helper\Data;
 use Model\User;
 use Helper\Mail;
 use Helper\ValidData;
@@ -13,7 +14,17 @@ use Route\Routes;
 class UserController
 {
     public static function register( Routes $request ) {
-        die( json_encode( $request ) );
+
+        /* Valid user */
+        //Validjwt::confirmAuthentication();
+        $labelsIn = [ 'name', 'email', 'phone', 'password' ];
+        $data = $request->data;
+        ValidData::validIn( $data, $labelsIn );
+        $user = new User();
+        //Valid unique email
+        $arrData = Data::getDataQuery( $data );
+        $response = $user->store( $arrData ) ?? [];
+        Response::response( 200, 'success', $response );
     }
 
     public static function index()
@@ -22,65 +33,38 @@ class UserController
         //Validjwt::confirmAuthentication();
         $user = new User();
         $response = $user->index();
-        die( json_encode( $response ) );
+        Response::response( 200, 'success', $response );
         //Response::returnResponse( $response );
     }
 
-    public static function find( $id )
+    public static function find( Routes $request )
     {
         /* Valid user */
-        Validjwt::confirmAuthentication();
-        $isNumeric = ValidData::isNumeric( $id );
-        if( sizeof( $isNumeric ) > 0 ) { /* Response::returnResponse( $isNumeric ); */ }
-        /* Create data */
-        $arrData = [':id' => $id ];
+        //Validjwt::confirmAuthentication();
+        $id = $request->param;
+        //Valid id is number
+        ValidData::isNumeric( $id );
         $user = new User();
-        $response = $user->find( $arrData );
-        //Response::returnResponse(( $response ) );
-    }
-    
-    public static function store( $data )
-    {
-        /* Valid user */
-        Validjwt::confirmAuthentication();
-        $labelsIn = [ 'name', 'email', 'phone', 'password' ];
-        $validIn = ValidData::validIN( $data, $labelsIn );
-        if( sizeof( $validIn) > 0 ) { /* Response::returnResponse( $validIn ); */ }
         /* Create data */
-        $arrData = [
-            ':name'     => $data->name,
-            ':email'    => $data->email,
-            ':phone'    => $data->phone,
-            ':password' => Password::Encryp( $data->password ),
-        ];
-        $user = new User();
-        $user = $user->store( $arrData );
-        
-        //Response::returnResponse( $user );
+        $response = $user->find( $id );
+        Response::response( 200, 'success', $response );
     }
 
-    public static function update( $data )
+    public static function update(  Routes $request )
     {
         /* Valid user */
-        Validjwt::confirmAuthentication();
+        //Validjwt::confirmAuthentication();
         $labelsIn = [  'id', 'name', 'email', 'phone' ];
+        $data = $request->data;
         /* Valid data */
-        $validIn = ValidData::validIN( $data, $labelsIn );
-        if( sizeof( $validIn) > 0 ) { /* Response::returnResponse( $validIn ); */ }
+        ValidData::validIn( $data, $labelsIn );
+        ValidData::isNumeric( $data->id );
         /* Valid id */
-        $isNumeric = ValidData::isNumeric( $data->id );
-        if( sizeof( $isNumeric ) > 0 ) { /* Response::returnResponse( $isNumeric ); */ }
         $user = new User();
-        /* Create Data */
-        $arrData = [
-            ':id'       => $data->id,
-            ':name'     => $data->name,
-            ':email'    => $data->email,
-            ':phone'    => $data->phone,
-        ];
-        $pass = ( $data->password !== null ) ? $data->password : '';
-        $response = $user->update( $arrData, $pass );
-        //Response::returnResponse( $response );
+        /* Updated */
+        $arrData = Data::getDataQuery( $data );
+        $response = $user->update( $arrData );
+        Response::response( 200, 'success', [ 'resposne' => $response ] );
     }
 
     public static function destroy( $id )
@@ -100,8 +84,7 @@ class UserController
     {
         $labelsIn = [ 'email', 'password' ];
         /* Valid data */
-        $validIn = ValidData::validIN( $data, $labelsIn );
-        if( sizeof( $validIn) > 0 ) { /* Response::returnResponse( $validIn ); */ }
+        ValidData::validIn( $data, $labelsIn );
         /* Create data */
         $arrData = [ ':email' => $data->email ];
         $user = new User();
@@ -146,8 +129,7 @@ class UserController
     {
         $labelsIn = [ 'email' ];
         /* Valid data */
-        $validIn = ValidData::validIN( $data, $labelsIn );
-        if( sizeof( $validIn) > 0 ) { /* Response::returnResponse( $validIn ); */ }
+        ValidData::validIn( $data, $labelsIn );
         $arrData = [ ':email' => $data->email ];
         $user = new User();
         $findUser = $user->login( $arrData );
@@ -189,8 +171,7 @@ class UserController
         Validjwt::confirmAuthentication();
         $labelsIn = [ 'email', 'password' ];
         /* Valid data */
-        $validIn = ValidData::validIN( $data, $labelsIn );
-        if( sizeof( $validIn) > 0 ) { /* Response::returnResponse( $validIn ); */ }
+        ValidData::validIn( $data, $labelsIn );
         /* Create Data */
         $arrData = [
             ':email'    => $data->email,

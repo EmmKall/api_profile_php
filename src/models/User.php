@@ -5,10 +5,11 @@ namespace Model;
 use Database\Conection;
 use Helper\Data;
 use Helper\Password;
+use Helper\Response;
 
 class User
 {
-    private array $columnsDB = [ 'id', 'name', 'email', 'phone', 'token', 'password', 'created_at', 'updated_at' ];
+    private array $columnsDB = [ 'id', 'name', 'email', 'phone', 'password', 'token', 'created_at', 'updated_at' ];
     private string $table = 'users';
 
     public function __construct()
@@ -19,68 +20,93 @@ class User
     public function index(): array
     {
         $removeColumns = [ 'password' ];
+        $order = ' name, email ';
         $columns = Data::removeColumns( $this->columnsDB, $removeColumns );
-        $columns = implode( ", ", $this->columnsDB );
-        $sql = ' SELECT ' . $columns . ' FROM ' . $this->table . ' ORDER BY name, email ';
-        $response = Conection::getAll( $sql );
+        $response = Conection::getAll( $this->table, $columns );
         return $response;
     }
 
-    public function find( $arrData ): array
+    public function find( $id ): array
     {
-        $sql = " SELECT id, name, email, phone, rol FROM users WHERE id = :id ";
-        $response = Conection::find( $sql, $arrData );
+        $removeColumns = [ 'password' ];
+        $columns = Data::removeColumns( $this->columnsDB, $removeColumns );
+        $response = Conection::find( $this->table, $columns, $id );
         return $response;
     }
 
-    public function store( $data ): array
+    public function store( $arrData )
     {
-        $sql = ' INSERT INTO users ( name, email, phone, password ) VALUES ( :name, :email, :phone, :password ) ';
-        $response = Conection::store( $sql, $data );
+        //Unique email
+        $email = $arrData[ ':email' ];
+        $emailRows = Conection::where( $this->table, 'email', $email );
+        if( sizeof( $emailRows ) > 0 ) { Response::response( 400, $email . ' is already registered' ); }
+        //Prepare statement and data
+        $arrData[ ':password' ] = $this->encryp( $arrData[ ':password' ] );
+        $arrData[ ':token' ] = $this->getToken();
+        $columns = Data::removeDates( $this->columnsDB, true );
+        //Insert row
+        $lastId = Conection::store( $this->table, $columns, $arrData );
+        $response = [ 'id inserted' => $lastId ];
         return $response;
     }
 
-    public function update( array $arrData, string $pass ): array
+    public function update( array $data ): string
     {
-        if( $pass !== '' )
+        $columns = Data::removeDates( $this->columnsDB, true );
+        $removeColumns = [ 'id', 'token' ];
+        if( !isset( $data[ ':password' ] ) || $data[ ':password' ] === '' )
         {
-            $sql = ' UPDATE users SET name = :name, email = :email, phone = :phone, password = :password WHERE id = :id ';
-            $arrData[':password'] = ( $pass !== null && trim( $pass ) !== '' ) ? Password::Encryp( $pass ) : '';
-        } else 
-        {
-            $sql = ' UPDATE users SET name = :name, email = :email, phone = :phone WHERE id = :id ';
+            $removeColumns[]  = 'password';
+            //$arrData[':password'] = ( $pass !== null && trim( $pass ) !== '' ) ? Password::Encryp( $pass ) : '';
+        } else {
+            $data[ ':password' ] = $this->encryp( $data[ ':password' ] );
         }
-        $response = Conection::update( $sql, $arrData );
+        $columns = Data::removeColumns( $columns, $removeColumns );
+        $response = Conection::update( $this->table, $columns, $data );
+        $response = ( $response === true ) ? 'Register updated' : 'Register not updated';
         return $response;
     }
 
     public function destroy( $arrData ): array
     {
         $sql = " DELETE FROM users WHERE id = :id ";
-        $response = Conection::find( $sql, $arrData );
-        return $response;
+        //$response = Conection::find( $sql, $arrData );
+        return [];
     }
 
     public function login( $arrData ): array
     {
         $sql = ' SELECT id, name, email, password FROM users WHERE email = :email ';
-        $response = Conection::find( $sql, $arrData );
-        return $response;
+        //$response = Conection::find( $sql, $arrData );
+        return [];
     }
 
     public static function setToken( $arrData ): array
     {
         $sql = ' UPDATE users SET token = :token WHERE id = :id';
-        $response = Conection::update( $sql, $arrData );
-        return $response;
+        //$response = Conection::update( $sql, $arrData );
+        return [];
 
     }
 
     public static function updatePassword( $arrData )
     {
         $sql = ' UPDATE users SET password = :password WHERE email = :email ';
-        $response = Conection::update( $sql, $arrData );
-        return $response;
+        //$response = Conection::update( $sql, $arrData );
+        return [];
     }
 
+    private function encryp( $password ){
+        $password = password_hash( $password, PASSWORD_BCRYPT );
+        return $password;
+    }
+
+    private function getToken() {
+        return uniqid();
+    }
+
+    private function validPassword( $password, $encryp ) {
+        $res = ( password_verify( $password, $encryp ) ); //$this->confimr === 1
+        if( !$res ) { Response::response( 400, 'Credentials not found/valid' ); }
+    }
 }

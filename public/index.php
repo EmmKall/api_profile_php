@@ -14,8 +14,10 @@ $router->post( 'updated_password', [ UserController:: class, 'updatePassword' ] 
 $router->post( 'forgot_password', [ UserController:: class, 'forgotPassword' ] ); */
 //User
 
-$router->post( 'user/', [ UserController::class, 'index' ] );
+$router->get( 'user/', [ UserController::class, 'index' ] );
+$router->get( 'user/find', [ UserController::class, 'find' ] );
 $router->post( 'user/register', [ UserController::class, 'register' ] );
+$router->put( 'user/update', [ UserController::class, 'update' ] );
 $router->post( 'user/login', [ UserController::class, 'login' ] );
 $router->post( 'user/updated', [ UserController::class, 'updated' ] );
 $router->post( 'user/change_password', [ UserController::class, 'updatedPassword' ] );
