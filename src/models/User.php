@@ -67,11 +67,12 @@ class User
         return $response;
     }
 
-    public function destroy( $arrData ): array
+    public function destroy( $id ): array
     {
-        $sql = " DELETE FROM users WHERE id = :id ";
-        //$response = Conection::find( $sql, $arrData );
-        return [];
+        $response = Conection::destroy( $this->table, $id );
+        if( $response[ 'status' ] === 200 ){ $response = [ 'msg' => 'Register deleted' ]; }
+        else { $response = [ 'msg' => 'Register not deleted' ]; }
+        return $response;
     }
 
     public function login( $arrData ): array

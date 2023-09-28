@@ -67,17 +67,16 @@ class UserController
         Response::response( 200, 'success', [ 'resposne' => $response ] );
     }
 
-    public static function destroy( $id )
+    public static function destroy( Routes $request )
     {
         /* Valid user */
-        Validjwt::confirmAuthentication();
-        $isNumeric = ValidData::isNumeric( $id );
-        if( sizeof( $isNumeric ) > 0 ) { /* Response::returnResponse( $isNumeric ); */ }
-        /* Create data */
-        $arrData = [':id' => $id ];
+        //Validjwt::confirmAuthentication();
+        $id = $request->param;
+        ValidData::isNumeric( $id );
         $user = new User();
-        $response = $user->destroy( $arrData );
-        //Response::returnResponse( $response );
+        /* Delete user */
+        $response = $user->destroy( $id );
+        Response::response( 200, 'success', $response );
     }
 
     public static function login( $data )

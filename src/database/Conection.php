@@ -208,25 +208,19 @@ class Conection
         return $response;
     }
 
-    public static function destroy( String $sql, Array $arrData )
+    public static function destroy( String $table, int $id )
     {
         $conn = Conection::make_conection();
-        $query = null;
+        $query = ' DELETE FROM ' . $table . ' WHERE id = ' . $id ;
         try
         {
-            $query = $conn->prepare( $sql );
-            $query->execute( $arrData );
-            $response = [
-                'status' => 200,
-                'msg' => 'Registro eliminado'
-            ];
+            $query = $conn->prepare( $query );
+            $query->execute( [] );
+            $response = [ 'status' => 200 ];
         } catch( \PDOException $e )
         {
             /* Log $e->getMessage() */
-            $response = [
-                'status' => 500,
-                'msg' => 'Hubo un error: ' . $e->getMessage() . ' en: ' . $e->getTrace() . ' linea: ' . $e->getLine()
-            ];
+            Response::response( 500, 'Error: ' . $e->getMessage() );
         }
         $query = null;
         $conn = null;

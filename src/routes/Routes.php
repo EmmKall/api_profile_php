@@ -65,7 +65,7 @@ class Routes
         if( $fn ) {
             call_user_func( $fn, $this );
         } else {
-            Response::response( 400, [], 'Data not fount' );
+            Response::response( 400, 'Data not found' );
         }
 
     }
