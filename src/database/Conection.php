@@ -2,6 +2,8 @@
 
 namespace Database;
 use Config\ConfigDB;
+use FTP\Connection;
+use Helper\Data;
 use Helper\Response;
 
 class Conection
@@ -188,10 +190,7 @@ class Conection
         unset( $arrData[ ':id' ] );
         $conn = Conection::make_conection();
         $sql = ' UPDATE ' .$table . ' SET ';
-        foreach ($columns as $key => $value) {
-            $sql .= ' ' . $value . ' = :' . $value;
-            $sql .= ( $key < sizeof( $columns ) - 1 ) ? ', ' : ' ';
-        }
+        $sql .=  Data::getStringLabels( $sql, $columns );
         $sql .= ' WHERE id = :id ';
         $arrData[ ':id' ] = $id;
         try
@@ -206,6 +205,23 @@ class Conection
         $query = null;
         $conn = null;
         return $response;
+    }
+
+    public static function updateQuery( string $table, string $labelUpdate, string $labelWhere, string $id, $value ){
+        $conn = Conection::make_conection();
+        $result = null;
+        $sql = ' UPDATE ' . $table . " SET ". $labelUpdate . " = '" . $value .  "' WHERE " . $labelWhere . ' = ' . $id . ' ';
+        try
+        {
+            $result = $conn->query( $sql );
+            $result->fetchall( \PDO::FETCH_CLASS );
+        } catch( \PDOException $e )
+        {
+            Response::response( 500, 'Hubo un error: ' . $e->getMessage() );
+        }
+        $result = null;
+        $conn = null;
+        return true;
     }
 
     public static function destroy( String $table, int $id )

@@ -6,6 +6,7 @@ use Database\Conection;
 use Helper\Data;
 use Helper\Password;
 use Helper\Response;
+use Helper\Validjwt;
 
 class User
 {
@@ -77,9 +78,26 @@ class User
 
     public function login( $arrData ): array
     {
-        $sql = ' SELECT id, name, email, password FROM users WHERE email = :email ';
-        //$response = Conection::find( $sql, $arrData );
-        return [];
+        $email = $arrData[ ':email' ];
+        $row = Conection::where( $this->table, 'email', $email );
+        if( sizeof( $row ) < 1 ) { Response::response( 400, $email . 'Credentials no valid' ); }
+        $row = $row[ 0 ];
+        $id = $row->id;
+        $name = $row->name;
+        $password = $row->password;
+        //Valid Password
+        $this->validPassword( $arrData[ ':password' ], $password );
+        $password = null;
+        $arrData[ ':password' ] = null;
+        //Update token
+        $token = Validjwt::setToken( $id, $email );
+        Conection::updateQuery( $this->table,  'token', 'id', $id, $token );
+        $response = [
+            'id'    => $id,
+            'name'  => $name,
+            'token' => $token
+        ];
+        return Response::response( 200, 'success', $response );
     }
 
     public static function setToken( $arrData ): array

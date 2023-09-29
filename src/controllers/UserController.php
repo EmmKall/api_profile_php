@@ -79,49 +79,40 @@ class UserController
         Response::response( 200, 'success', $response );
     }
 
-    public static function login( $data )
+    public static function login(  Routes $request )
     {
         $labelsIn = [ 'email', 'password' ];
         /* Valid data */
+        $data = $request->data;
         ValidData::validIn( $data, $labelsIn );
-        /* Create data */
-        $arrData = [ ':email' => $data->email ];
         $user = new User();
-        $findUser = $user->login( $arrData );
-        if( !$findUser[ 'data' ] ){ /* Response::returnResponse([
-            'status' => 403,
-            'msg'    => 'Email y/o password not valid'
-        ]); */ }
-        /* Valid Password */
-        Password::DesEncryp( $data->password, $findUser[ 'data']['password'] );
-        /* Update Token */
-        $id    = $findUser[ 'data' ][ 'id' ];
-        $email = $findUser[ 'data' ][ 'email' ];
-        
-        $token = Validjwt::setToken( $id, $email );
+        $arrData = Data::getDataQuery( $data );
+        $user = new User();
+        $res = $user->login( $arrData );
+        Response::debugear( $res );
         /* Actualizar Token */
-        $arrData = [
+        /* $arrData = [
             ':token' => $token,
             ':id'    =>$id
-        ];
-        $updateToken = $user->setToken( $arrData );
-        if( $updateToken[ 'status' ] === 200 )
+        ]; */
+        //$updateToken = $user->setToken( $arrData );
+        /* if( $updateToken[ 'status' ] === 200 )
         {
-            /* Response::returnResponse([
+            Response::returnResponse([
                 'status' => 200,
                 'data'   => [
                     'user'   => $findUser[ 'data' ][ 'name' ],
                     'token'  => $token,
                     'id'     => $id
                 ]
-            ]); */
+            ]); 
         } else
         {
-            /* Response::returnResponse([
+            Response::returnResponse([
                 'status' => 500,
                 'msg'   => 'internal error'
-            ]); */
-        }
+            ]); 
+        } */
     }
 
     public static function forget_password( $data )

@@ -17,7 +17,7 @@ class Validjwt
             'data' => [
                 'id'    => $id,
                 'email' => $email
-        ]
+            ]
         ];
         $jwt = JWT::encode( $token, $_ENV[ 'SECRET_KEY' ], $_ENV[ 'ALGORITM' ] );
         return $jwt;
@@ -43,10 +43,7 @@ class Validjwt
         } catch( \Exception $e )
         {
             //Registro de Log
-            Response::returnResponse([
-                'status' => 503,
-                'msg'    => 'Error: ' . $e->getMessage()
-            ]);
+            Response::response( 503, 'Error: ' . $e->getMessage() );
         }
         
         return $isOnTime;
@@ -56,12 +53,8 @@ class Validjwt
     {
         $esConfirmado = false;
         //Validar datos de usuario
-        $sql = ' SELECT id, name FROM users WHERE id = :id AND email = :email ';
-        $arrData = [
-            ':id'    => $id,
-            ':email' => $email
-        ];
-        $result = Conection::find( $sql, $arrData );
+        $result = Conection::where( 'users', 'email', $email );
+        Response::debugear( $result );
         $name = $result[ 'data' ][ 'name' ];
         /* Validar datos de jwt */
         if( $result['data']['id'] === $id && $result['data']['name'] === $name  )
@@ -128,11 +121,7 @@ class Validjwt
             }
         } else
         {
-            $response = [
-                'status' => 403,
-                'msg'    => 'invalid credentials'
-            ];
-            Response::returnResponse( $response );
+            Response::response( 403, 'Credentials no valid' );
         }
         return $isAuthenticate;
     }

@@ -95,4 +95,12 @@ class Data
         return $arrData;
     }
 
+    public static function getStringLabels( string $sql, array $columns ) {
+        foreach ($columns as $key => $value) {
+            $sql .= ' ' . $value . ' = :' . $value;
+            $sql .= ( $key < sizeof( $columns ) - 1 ) ? ', ' : ' ';
+        }
+        return $sql;
+    }
+
 }
