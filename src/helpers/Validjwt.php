@@ -45,7 +45,6 @@ class Validjwt
             //Registro de Log
             Response::response( 503, 'Error: ' . $e->getMessage() );
         }
-        
         return $isOnTime;
     }
 
@@ -54,10 +53,10 @@ class Validjwt
         $esConfirmado = false;
         //Validar datos de usuario
         $result = Conection::where( 'users', 'email', $email );
-        Response::debugear( $result );
-        $name = $result[ 'data' ][ 'name' ];
+        $result = $result[ 0 ];
+        $email = $result->email;
         /* Validar datos de jwt */
-        if( $result['data']['id'] === $id && $result['data']['name'] === $name  )
+        if( $result->id === $id && $result->email === $email  )
         {
             $esConfirmado = true;
         }
@@ -108,7 +107,7 @@ class Validjwt
         return $response;
     }
 
-    public static function confirmAuthentication(): Bool
+    public static function confirmAuthentication()
     {
         $isAuthenticate = false;
         $jwt = Self::readHeader();
@@ -123,7 +122,6 @@ class Validjwt
         {
             Response::response( 403, 'Credentials no valid' );
         }
-        return $isAuthenticate;
     }
 
 }

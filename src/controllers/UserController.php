@@ -16,7 +16,7 @@ class UserController
     public static function register( Routes $request ) {
 
         /* Valid user */
-        //Validjwt::confirmAuthentication();
+        Validjwt::confirmAuthentication();
         $labelsIn = [ 'name', 'email', 'phone', 'password' ];
         $data = $request->data;
         ValidData::validIn( $data, $labelsIn );
@@ -30,17 +30,16 @@ class UserController
     public static function index()
     {
         /* Valid user */
-        //Validjwt::confirmAuthentication();
+        Validjwt::confirmAuthentication();
         $user = new User();
         $response = $user->index();
         Response::response( 200, 'success', $response );
-        //Response::returnResponse( $response );
     }
 
     public static function find( Routes $request )
     {
         /* Valid user */
-        //Validjwt::confirmAuthentication();
+        Validjwt::confirmAuthentication();
         $id = $request->param;
         //Valid id is number
         ValidData::isNumeric( $id );
@@ -53,7 +52,7 @@ class UserController
     public static function update(  Routes $request )
     {
         /* Valid user */
-        //Validjwt::confirmAuthentication();
+        Validjwt::confirmAuthentication();
         $labelsIn = [  'id', 'name', 'email', 'phone' ];
         $data = $request->data;
         /* Valid data */
@@ -70,7 +69,7 @@ class UserController
     public static function destroy( Routes $request )
     {
         /* Valid user */
-        //Validjwt::confirmAuthentication();
+        Validjwt::confirmAuthentication();
         $id = $request->param;
         ValidData::isNumeric( $id );
         $user = new User();

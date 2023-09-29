@@ -189,8 +189,8 @@ class Conection
         $id = $arrData[ ':id' ];
         unset( $arrData[ ':id' ] );
         $conn = Conection::make_conection();
-        $sql = ' UPDATE ' .$table . ' SET ';
-        $sql .=  Data::getStringLabels( $sql, $columns );
+        $sql = ' UPDATE ' .$table . ' SET';
+        $sql =  Data::getStringLabels( $sql, $columns );
         $sql .= ' WHERE id = :id ';
         $arrData[ ':id' ] = $id;
         try

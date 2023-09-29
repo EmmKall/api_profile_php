@@ -23,7 +23,7 @@ class User
         $removeColumns = [ 'password' ];
         $order = ' name, email ';
         $columns = Data::removeColumns( $this->columnsDB, $removeColumns );
-        $response = Conection::getAll( $this->table, $columns );
+        $response = Conection::getAll( $this->table, $columns, $order );
         return $response;
     }
 
