@@ -5,6 +5,7 @@ namespace Controller;
 use Helper\Data;
 use Model\User;
 use Helper\Mail;
+use Helper\BodyMail;
 use Helper\ValidData;
 use Helper\Password;
 use Helper\Response;
@@ -24,7 +25,15 @@ class UserController
         //Valid unique email
         $arrData = Data::getDataQuery( $data );
         $response = $user->store( $arrData ) ?? [];
+        //Send response
         Response::response( 200, 'success', $response );
+    }
+
+    public static function confirm( Routes $request ){
+        $token = $request->param;
+        $user = new User();
+        $response = $user->comfirm( $token );
+        Response::response( 200, 'User confirmed', $response );
     }
 
     public static function index()

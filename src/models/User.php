@@ -3,7 +3,10 @@
 namespace Model;
 
 use Database\Conection;
+use FTP\Connection;
+use Helper\BodyMail;
 use Helper\Data;
+use Helper\Mail;
 use Helper\Password;
 use Helper\Response;
 use Helper\Validjwt;
@@ -35,6 +38,21 @@ class User
         return $response;
     }
 
+    public function comfirm( string $token ) {
+        $token = htmlentities( $token);
+        $user = Conection::where( $this->table, 'token', $token );
+        if( $user === null || sizeof( $user )  === 0 ){
+            Response::response( 400, 'Data not found' );
+        }
+        $user = $user[ 0 ];
+        //Delete token & confirm
+        if( Conection::updateQuery( $this->table, 'confirm', $user->id, 1 ) ){
+            Conection::updateQuery( $this->table, 'token', $user->id, '' );
+        }
+        $response = [ 'msg' => 'User confirmed' ];
+        Response::debugear( $response );
+    }
+
     public function store( $arrData )
     {
         //Unique email
@@ -45,8 +63,13 @@ class User
         $arrData[ ':password' ] = $this->encryp( $arrData[ ':password' ] );
         $arrData[ ':token' ] = $this->getToken();
         $columns = Data::removeDates( $this->columnsDB, true );
+        //Send email
+        $mail = new Mail();
+        $body = BodyMail::register( $arrData[ ':name' ], $arrData[ ':token' ] );
+        $mail->sendConfirmation( $arrData[ ':email' ], $arrData[ ':name' ], $body );
         //Insert row
         $lastId = Conection::store( $this->table, $columns, $arrData );
+        //Return response
         $response = [ 'id inserted' => $lastId ];
         return $response;
     }

@@ -7,15 +7,11 @@ use Controller\UserController;
 
 $router = new Routes;
 
-/* $router->get( '', [ UserController::class, 'index' ] );
-$router->post( 'login', [ UserController:: class, 'login' ] );
-$router->post( 'register', [ UserController:: class, 'register' ] );
-$router->post( 'updated_password', [ UserController:: class, 'updatePassword' ] );
-$router->post( 'forgot_password', [ UserController:: class, 'forgotPassword' ] ); */
 //User
 $router->post( 'login/', [ UserController::class, 'login' ] );
 $router->get( 'user/', [ UserController::class, 'index' ] );
 $router->get( 'user/find', [ UserController::class, 'find' ] );
+$router->get( 'user/confirm', [ UserController::class, 'confirm' ] );
 $router->post( 'user/register', [ UserController::class, 'register' ] );
 $router->put( 'user/update', [ UserController::class, 'update' ] );
 $router->delete( 'user/destroy', [ UserController::class, 'destroy' ] );
