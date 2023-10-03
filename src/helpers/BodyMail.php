@@ -18,5 +18,15 @@ class BodyMail {
         $content = str_replace( '$body', $body, $content );
         return $content;
     }
+    
+    public static function forgetPassword( $password, $name ) {
+        $content = self::getFormat();
+        $body = '<p style="color: #0C84B8;">' . $name . ' your password was recovered <b>' . $_ENV[ 'SYSTEM_NAME' ] . '</b></p>';
+        $body = '<p>Here is your new password: <span style="font-weight: bolder; color: #0C84B8; ">' . $password . '</span></p>';
+        $body .= '<p>You are one step away from completing your registration in Api EmmKall, click on the following link to complete your registration and be able to interact with the system.</p>';
+        $content = str_replace( '$title', 'Password forgotten', $content ); 
+        $content = str_replace( '$body', $body, $content );
+        return $content;
+    }
 
 }

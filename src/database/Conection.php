@@ -207,10 +207,10 @@ class Conection
         return $response;
     }
 
-    public static function updateQuery( string $table, $labelUpdate, string $id, $value ){
+    public static function updateQuery( string $table, $labelUpdate, $id, $value ){
         $conn = Conection::make_conection();
         $result = null;
-        $sql = ' UPDATE ' . $table . " SET ". $labelUpdate . " = " . ( ( $value > 0 ) ? $value : "'" . $value . "'" ) .  " WHERE id" . ' = ' . $id . ' ';
+        $sql = ' UPDATE ' . $table . " SET ". $labelUpdate . " = " . ( ( gettype( $value ) !== 'string' ) ? $value : "'" . $value . "'" ) .  " WHERE id" . ' = ' . $id . ' ';
         try
         {
             $result = $conn->query( $sql );

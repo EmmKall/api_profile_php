@@ -42,7 +42,7 @@ class User
         $token = htmlentities( $token);
         $user = Conection::where( $this->table, 'token', $token );
         if( $user === null || sizeof( $user )  === 0 ){
-            Response::response( 400, 'Data not found' );
+            Response::response( 400, 'Data no valid' );
         }
         $user = $user[ 0 ];
         //Delete token & confirm
@@ -111,30 +111,50 @@ class User
         //Valid Password
         $this->validPassword( $arrData[ ':password' ], $password );
         $password = null;
-        $arrData[ ':password' ] = null;
+        unset( $arrData[ ':password' ] );
         //Update token
         $token = Validjwt::setToken( $id, $email );
-        Conection::updateQuery( $this->table,  'token', 'id', $id, $token );
+        $arrData[ ':token' ] = $token;
+        Conection::updateQuery( $this->table,  'token', $id, $token );
         $response = [
             'id'    => $id,
             'name'  => $name,
             'token' => $token
         ];
-        return Response::response( 200, 'success', $response );
+        return $response;
+    }
+
+    public function forgetPassword( array $arrData ){
+        //Find user
+        $row = Conection::where( $this->table, 'email', $arrData[ ':email' ] );
+        if( sizeof( $row ) < 1) {
+            Response::response( 400, 'Data not found' );
+        }
+        $row = $row[ 0 ];
+        $password = $this->generatePassword();
+        $pass_encryp = $this->encryp( $password );
+        //Update Password
+        $res = Conection::updateQuery( $this->table, 'password', $row->id, $pass_encryp );
+        if( $res !== true ){ Response::response( 500, 'Error recovering password' ); }
+        //Send by email
+        //Send email
+        $mail = new Mail();
+        $body = BodyMail::forgetPassword( $password, $row->name );
+        $mail->sendConfirmation( $arrData[ ':email' ], $row->name, $body );
+        //Response
+        $response = [ 'msg' => 'Password was updated and sent by email' ];
+        return $response;
     }
 
     public static function setToken( $arrData ): array
     {
         $sql = ' UPDATE users SET token = :token WHERE id = :id';
-        //$response = Conection::update( $sql, $arrData );
         return [];
-
     }
 
     public static function updatePassword( $arrData )
     {
         $sql = ' UPDATE users SET password = :password WHERE email = :email ';
-        //$response = Conection::update( $sql, $arrData );
         return [];
     }
 
@@ -145,6 +165,16 @@ class User
 
     private function getToken() {
         return uniqid();
+    }
+
+    private function generatePassword( int $long = 12 ) {
+        $allow_character = 'abcdefghijklmnñopqrstuvwxyzABCDEFGHIJKLMNÑOPQRSTUVWXYZ0123456789_-@';
+        $long = $long - 1;
+        $password = '';
+        for( $i = 0; $i < $long; $i++ ){
+            $password .= $allow_character[ random_int( 0, $long ) ];
+        }
+        return $password;
     }
 
     private function validPassword( $password, $encryp ) {

@@ -96,71 +96,19 @@ class UserController
         $user = new User();
         $arrData = Data::getDataQuery( $data );
         $user = new User();
-        $res = $user->login( $arrData );
-        Response::debugear( $res );
-        /* Actualizar Token */
-        /* $arrData = [
-            ':token' => $token,
-            ':id'    =>$id
-        ]; */
-        //$updateToken = $user->setToken( $arrData );
-        /* if( $updateToken[ 'status' ] === 200 )
-        {
-            Response::returnResponse([
-                'status' => 200,
-                'data'   => [
-                    'user'   => $findUser[ 'data' ][ 'name' ],
-                    'token'  => $token,
-                    'id'     => $id
-                ]
-            ]); 
-        } else
-        {
-            Response::returnResponse([
-                'status' => 500,
-                'msg'   => 'internal error'
-            ]); 
-        } */
+        $response = $user->login( $arrData );
+        Response::response( 200, 'success', $response );
     }
 
-    public static function forget_password( $data )
+    public static function forgetPassword( Routes $request )
     {
         $labelsIn = [ 'email' ];
-        /* Valid data */
+        $data = $request->data;
         ValidData::validIn( $data, $labelsIn );
-        $arrData = [ ':email' => $data->email ];
+        $arrData = Data::getDataQuery( $data );
         $user = new User();
-        $findUser = $user->login( $arrData );
-        if( !$findUser[ 'data' ] ){ /* Response::returnResponse([
-            'status' => 403,
-            'msg'    => 'Internal error'
-        ]); */ }
-        /* Generar ramdom password */
-        $new_pass = Password::genereRamdomPassword();
-        /* Update new password */
-        $arrData = [
-            ':email' => $data->email,
-            ':password' => Password::Encryp( $new_pass )
-        ];
-        $updatePass = $user->updatePassword( $arrData );
-        if( $updatePass[ 'status' ] !== 200 )
-        {
-            $response = [
-                'status' => 500,
-                'msg'    => 'Internal error'
-            ];
-            //Response::returnResponse( $response );
-        }
-        /* Send by email */
-        $body_mail = Mail::create_body( $new_pass );
-        //$wasSendMail = Mail::send_mail( $data->email, $body_mail, 'Recover password', [] );
-        Mail::sendFastMail( 'ing.emmanuel.cal@gmail.com', 'Recover Password', $body_mail );
-        $response = [
-            'status'   => 200,
-            'email'    => $data->email,
-            'new_pass' => $new_pass
-        ];        // Response
-        //Response::returnResponse( $response );
+        $response = $user->forgetPassword( $arrData );
+        Response::response( 200, 'success', $response );
     }
 
     public static function update_pass( $data )
