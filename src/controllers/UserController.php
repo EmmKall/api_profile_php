@@ -111,22 +111,20 @@ class UserController
         Response::response( 200, 'success', $response );
     }
 
-    public static function update_pass( $data )
+    public static function updatedPassword( Routes $request )
     {
         /* Valid user */
+        $data = $request->data;
         Validjwt::confirmAuthentication();
-        $labelsIn = [ 'email', 'password' ];
         /* Valid data */
+        $labelsIn = [ 'email', 'password' ];
         ValidData::validIn( $data, $labelsIn );
-        /* Create Data */
-        $arrData = [
-            ':email'    => $data->email,
-            ':password' => Password::Encryp( $data->password )
-        ];
-        /* Update Password */
+        $arrData = Data::getDataQuery( $data );
         $user = new User();
-        $response = $user->updatePassword( $arrData );
-        //Response::returnResponse( $response );
+        $user->updatePassword( $arrData );
+        // Update Password
+        $response = [ 'msg' => 'Data updated' ];
+        Response::response( 200, 'success', $response );
     }
 
 }

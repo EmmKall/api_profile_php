@@ -47,8 +47,10 @@ class User
         $user = $user[ 0 ];
         //Delete token & confirm
         if( Conection::updateQuery( $this->table, 'confirm', $user->id, 1 ) ){
-            Conection::updateQuery( $this->table, 'token', $user->id, '' );
-        }
+            if( !Conection::updateQuery( $this->table, 'token', $user->id, '' ) ){
+                Response::response( 500, 'Error to confirm user' );
+            }
+        } else { Response::response( 500, 'Error to confirm user' ); }
         $response = [ 'msg' => 'User confirmed' ];
         Response::debugear( $response );
     }
@@ -152,10 +154,19 @@ class User
         return [];
     }
 
-    public static function updatePassword( $arrData )
+    public function updatePassword( $arrData )
     {
-        $sql = ' UPDATE users SET password = :password WHERE email = :email ';
-        return [];
+        $row = Conection::where( $this->table, 'email', $arrData[ ':email' ] );
+        if( sizeof( $row ) < 1) {
+            Response::response( 400, 'Data not found' );
+        }
+        $row = $row[ 0 ];
+        //Update Password
+        $password = $this->encryp( $arrData[ ':password' ] );
+        if( Conection::updateQuery( $this->table, 'password', $row->id, $password ) !== true ){
+            Response::response( 500, 'Error to updated password' );
+        }
+        return true;
     }
 
     private function encryp( $password ){
