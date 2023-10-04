@@ -2,3 +2,4 @@
 .env-dev
 /vendor
 /src/config/ConfigDB.php
+schema.sql
